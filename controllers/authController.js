@@ -28,23 +28,19 @@ exports.registerUser = async (req, res) => {
             await Chef.create({ user: user._id });
         }
 
-        // Send Notification Email
-        try {
-            await sendEmail({
-                email: user.email,
-                subject: 'Welcome to HomeZaika!',
-                html: `
-                    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333 text-align: center;">
-                        <h2 style="color: #2563eb;">Welcome to HomeZaika, ${user.name}!</h2>
-                        <p>You have successfully registered to HomeZaika. Thanks for using our services.</p>
-                        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                        <p style="font-size: 12px; color: #666;">Start exploring fresh homemade food now!</p>
-                    </div>
-                `
-            });
-        } catch (emailError) {
-            console.error('Registration email failed:', emailError);
-        }
+        // Send Notification Email (Non-blocking)
+        sendEmail({
+            email: user.email,
+            subject: 'Welcome to HomeZaika!',
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; text-align: center;">
+                    <h2 style="color: #2563eb;">Welcome to HomeZaika, ${user.name}!</h2>
+                    <p>You have successfully registered to HomeZaika. Thanks for using our services.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                    <p style="font-size: 12px; color: #666;">Start exploring fresh homemade food now!</p>
+                </div>
+            `
+        }).catch(err => console.error('Background Email Error:', err));
 
         res.status(201).json({
             success: true,

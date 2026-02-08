@@ -9,6 +9,15 @@ const sendEmail = async (options) => {
         }
     });
 
+    // Verify connection configuration
+    try {
+        await transporter.verify();
+        console.log('✅ SMTP Connection Established');
+    } catch (error) {
+        console.error('❌ SMTP Connection Error:', error);
+        throw error; // Re-throw to be caught by caller
+    }
+
     const mailOptions = {
         from: `HOMEZaika <${process.env.EMAIL_USER}>`,
         to: options.email,
@@ -16,7 +25,8 @@ const sendEmail = async (options) => {
         html: options.html
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent: %s', info.messageId);
 };
 
 module.exports = sendEmail;
